@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+.env
+*.zip
+.agents/
+.codex/
+venv/
+.venv/
+
+wandb/
+
+data/carbonate_1223
+data/carbonate_1223 _merge
+Their_model.ipynb
+
+models/
+checkpoints/
+*.pt
+*.pth
+
+.DS_Store

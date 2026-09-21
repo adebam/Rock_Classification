@@ -1,0 +1,33 @@
+# Create: conda env create -f environment.yml
+# Activate: conda activate rock-classification
+# Launch notebooks: jupyter lab
+# Direct dependency versions from W&B run-20260918_062823-z09p430c.
+# Transitive dependencies are not locked; this is not a complete environment lockfile.
+# PyTorch GPU support depends on the installed wheel and a compatible GPU driver.
+name: rock-classification
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      # Notebook interface and kernel
+      - jupyterlab==4.5.8
+      - ipykernel==7.2.0
+      - ipywidgets==8.1.8
+      # Training and model evaluation
+      - torch==2.14.0
+      - torchvision==0.29.0
+      - torchmetrics==1.9.0
+      - torchinfo==1.8.0
+      - optuna==4.9.0
+      - wandb==0.29.0
+      # Data processing and visualization
+      - numpy==2.3.5
+      - pandas==2.3.3
+      - pillow==12.3.0
+      - scikit-learn==1.9.0
+      - matplotlib==3.11.1
+      - seaborn==0.13.2
+      - mlxtend==0.25.0
+      - tqdm==4.67.3
