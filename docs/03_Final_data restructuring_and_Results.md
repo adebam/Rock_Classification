@@ -64,6 +64,11 @@ Because the merged classes no longer exist as separate targets in the 18-class f
 
 ## Confusion Matrix Result on Validation Data
 
+<p align="center">
+  <img src="../pictures/18classes_confusionMaxtrixValidation.png" alt="Val_18ClassconfusionMatrix"><br>
+  <i>Figure 3: F1-score by class, 18 classes vs 22 classes</i>
+</p>
+
 The confusion matrix for the restructured 18-class problem shows that merging the selected class pairs simplified some of the previously ambiguous decision boundaries, but did not eliminate the broader classification difficulty.
 
 The merged **Class 2/Class 13** category shows relatively strong separation, with approximately 844 of 1,083 images classified correctly. This suggests that the combined category forms a reasonably coherent target after the distinction between the original two classes is removed.

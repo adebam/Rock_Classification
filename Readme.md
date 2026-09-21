@@ -109,7 +109,7 @@ Rock_Classification/
 ├── docs
 │   ├── 01_problem_and_dataset.md
 │   ├── 02_Models&Experimentation.md
-│   └── 03_Final_data restructuring_and_Results.mdntitled.txt
+│   └── 03_Final_data restructuring_and_Results.md
 ├── duplicate_report.csv
 ├── environment.yml
 ├── models
