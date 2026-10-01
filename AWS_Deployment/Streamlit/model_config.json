@@ -1,0 +1,16 @@
+{
+  "architecture": "convnext_tiny",
+  "num_classes": 18,
+
+  "image_size": 224,
+  "resize_size": 256,
+  "remove_bottom_pixels": 90,
+
+  "confidence_threshold": 0.75,
+  "top_k": 3,
+
+  "model_filename": "INFERENCE_MERGED__18_class_convnext_tiny_reproduce_adamw_trial21_epoch11.pth",
+
+  "class_names_file": "class_names.json",
+
+}

@@ -1,0 +1,3 @@
+[submodule "demos/Gradio/rock_classification_huggingface/rock_classification"]
+	path = demos/Gradio/rock_classification_huggingface/rock_classification
+	url = git@hf.co:spaces/adebam/rock_classification

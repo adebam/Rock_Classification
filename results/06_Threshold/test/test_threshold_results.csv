@@ -1,0 +1,3 @@
+purpose,threshold,accepted_images,total_images,coverage,accuracy,correct_accepted_images,disagreement_images,rejected_images
+main_result,0.75,923,2786,0.3312993539124192,0.47670639219934996,440,483,1863
+label_review,0.9,380,2786,0.1363962670495334,0.46842105263157896,178,202,2406

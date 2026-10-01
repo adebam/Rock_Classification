@@ -1,0 +1,13 @@
+{
+  "split": "validation",
+  "source_predictions": "validation_predictions.csv",
+  "high_confidence_threshold": 0.75,
+  "pair_confidence_threshold": 0.9,
+  "minimum_pair_count": 70,
+  "selection_rule": "confidence >= cutoff and prediction != provided label",
+  "pair_direction": "provided label -> model prediction",
+  "total_validation_images": 5994,
+  "high_confidence_disagreements": 796,
+  "strict_disagreements": 339,
+  "strong_pair_candidates": 0
+}

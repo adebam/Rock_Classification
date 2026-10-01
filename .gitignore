@@ -21,3 +21,8 @@ checkpoints/
 *.pth
 
 .DS_Store
+
+AWS_Deployment/credentials/
+*.pem
+AWS_Deployment/Streamlit/S3data_download/
+.streamlit/secrets.toml
