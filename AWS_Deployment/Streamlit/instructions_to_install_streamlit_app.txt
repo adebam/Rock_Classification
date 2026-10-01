@@ -1,0 +1,34 @@
+Step 1 Selectively clone  the repository
+git clone --depth 1 --filter=blob:none --sparse \
+  https://github.com/adebam/Rock_Classification.git
+
+cd Rock_Classification
+
+git sparse-checkout set AWS_Deployment/Streamlit
+
+Step 2 Create an environment for the app
+mamba create -n rock-streamlit python=3.12 pip -y
+
+Step 3Activate the environment
+conda activate rock-streamlit
+
+Step 4 Enter the Streamlit folder and install dependencies
+cd AWS_Deployment/Streamlit
+python -m pip install -r requirements.txt
+
+Step 5
+Ensure AWS access is configured
+
+Step 6
+python -m streamlit run streamlit_app.py
+
+Step 7
+Locally, open http://localhost:8501.
+
+OR
+on ec2 use
+python -m streamlit run streamlit_app.py --server.address=0.0.0.0
+
+For direct access, EC2 networking must allow inbound TCP port 8501 from your IP. Open http://YOUR_EC2_PUBLIC_IP:8501 in your browser.
+
+
