@@ -23,7 +23,7 @@ Step 6
 python -m streamlit run streamlit_app.py
 OR
 run this so that when you lose internet, your app doesn't die
-nohup python -m streamlit run streamlit_app.py --server.address=0.0.0.0 > streamlit.log 2>&1 &
+nohup python -m uvicorn fast_api_app:app --host 127.0.0.1 --port 8000 > fastapi.log 2>&1 &
 kill it by 
 pkill -f "streamlit run streamlit_app.py"
 
@@ -32,7 +32,13 @@ Locally, open http://localhost:8501.
 
 OR
 on ec2 use
-python -m streamlit run streamlit_app.py --server.address=0.0.0.0
+nohup python -m uvicorn fast_api_app:app \
+  --host 127.0.0.1 --port 8000 \
+  > fastapi.log 2>&1 &
+
+nohup python -m streamlit run streamlit_app.py \
+  --server.address=127.0.0.1 --server.port=8501 \
+  > streamlit.log 2>&1 &
 
 For direct access, EC2 networking must allow inbound TCP port 8501 from your IP. Open http://YOUR_EC2_PUBLIC_IP:8501 in your browser.
 

@@ -1,4 +1,6 @@
 # Direct dependencies for streamlit_app.py and helper_functions.py.
+fastapi==0.142.2
+uvicorn==0.53.0
 streamlit
 torch
 torchvision
@@ -6,4 +8,5 @@ pandas
 Pillow
 boto3
 requests
+python-multipart
 pydantic>=2,<3
