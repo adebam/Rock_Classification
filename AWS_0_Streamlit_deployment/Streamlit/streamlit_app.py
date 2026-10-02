@@ -103,7 +103,7 @@ def predict_image(image):
             "Probability": probability.item()
         })
     return predicted_class, confidence, top3
-    
+
 # ============================================================
 # STREAMLIT APP
 # ============================================================
@@ -117,6 +117,8 @@ st.write("ConvNeXt-Tiny 18-Class Carbonate Rock Classifier")
 st.header("2. Prediction")
 prediction_mode = st.radio("Choose prediction mode",
     [
+        "s3 Images",
+        "Multiple s3 Images",
         "Single Image",
         "Multiple Images",
         "Local Test Folder",
@@ -136,3 +138,9 @@ elif prediction_mode == "Local Test Folder":
 elif prediction_mode == "URL":
     from helper_functions import url_prediction
     url_prediction(predict_image, CONFIDENCE_THRESHOLD)
+elif prediction_mode == "s3 Images":
+    from helper_functions import s3_prediction
+    s3_prediction(predict_image, CONFIDENCE_THRESHOLD,BUCKET_NAME="super-dayo-409400548716",image_prefix="data/Rock-classification/test/")
+elif prediction_mode == "Multiple s3 Images":
+    from helper_functions import s3_multi_image_prediction
+    s3_multi_image_prediction(predict_image, CONFIDENCE_THRESHOLD,BUCKET_NAME="super-dayo-409400548716",image_prefix="data/Rock-classification/test/")

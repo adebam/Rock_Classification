@@ -1,0 +1,1 @@
+ssh -i /home/d/.ssh/Super_dayo_keypair.pem ubuntu@ec2-3-217-190-12.compute-1.amazonaws.com

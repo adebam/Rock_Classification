@@ -1,0 +1,27 @@
+Step 1
+Log into ec2 normally
+ssh -i /home/d/.ssh/Super_dayo_keypair.pem ubuntu@18.206.241.86  change your ip address if you have too
+
+Step 2
+You can check whether Check whether Jupyter is running
+ss -ltnp | grep 8888  should see nothing
+
+Step 3
+Start jupter lab on ec2
+jupyter lab --no-browser --ip=127.0.0.1 --port=8888  8888 is the port on ec2
+LEAVE THIS TERMINAL RUNNING
+
+Step 4
+Open a SECOND local terminal
+ssh -i /home/d/.ssh/Super_dayo_keypair.pem \
+    -N \
+    -o ExitOnForwardFailure=yes \
+    -L 18089:127.0.0.1:8888 \
+    ubuntu@18.206.241.86
+
+Step 5
+Open Jupyter in your local browser
+http://localhost:18089
+
+
+The important part is that port 18089 is on your laptop, while port 8888 is on EC2.

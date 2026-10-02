@@ -1,0 +1,8 @@
+git clone --depth 1 --filter=blob:none --sparse \
+  https://github.com/YOUR_USERNAME/Rock_Classification.git
+
+cd Rock_Classification
+
+git sparse-checkout set AWS_Deployment/Streamlit
+
+cd AWS_Deployment/Streamlit

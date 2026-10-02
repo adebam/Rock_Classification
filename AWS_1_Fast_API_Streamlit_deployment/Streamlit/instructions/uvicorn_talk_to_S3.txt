@@ -1,0 +1,5 @@
+
+
+AWS_PROFILE=Super_Dayo python -m uvicorn fast_api_app:app --reload
+you have to do the same for streamlit
+AWS_PROFILE=Super_Dayo python -m streamlit run streamlit_app.py

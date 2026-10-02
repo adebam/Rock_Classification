@@ -21,6 +21,11 @@ Ensure AWS access is configured
 
 Step 6
 python -m streamlit run streamlit_app.py
+OR
+run this so that when you lose internet, your app doesn't die
+nohup python -m streamlit run streamlit_app.py --server.address=0.0.0.0 > streamlit.log 2>&1 &
+kill it by 
+pkill -f "streamlit run streamlit_app.py"
 
 Step 7
 Locally, open http://localhost:8501.

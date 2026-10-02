@@ -1,0 +1,9 @@
+# Direct dependencies for streamlit_app.py and helper_functions.py.
+streamlit
+torch
+torchvision
+pandas
+Pillow
+boto3
+requests
+pydantic>=2,<3
