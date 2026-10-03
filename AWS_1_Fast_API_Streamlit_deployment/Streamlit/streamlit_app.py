@@ -19,6 +19,12 @@ st.write("ConvNeXt-Tiny 18-Class Carbonate Rock Classifier")
 # ============================================================
 # SELECT PREDICTION TYPE
 # ============================================================
+st.markdown("##### *How to choose*")
+st.write("choose *s3 Images* to analyze one image from Amazon s3 bucket")
+st.write("choose *Multiple s3 Images* to analyze multiple images from Amazon s3 bucket")
+st.write("choose *Single Images* to analyze a single image uploaded from local computer")
+st.write("choose *Multiple Images* to analyze a multiple images uploaded from local computer")
+
 st.header("2. Prediction")
 prediction_mode = st.radio("Choose prediction mode",
     [

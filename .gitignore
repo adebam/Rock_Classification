@@ -26,3 +26,4 @@ AWS_Deployment/credentials/
 *.pem
 AWS_Deployment/Streamlit/S3data_download/
 .streamlit/secrets.toml
+AWS_1_Fast_API_Streamlit_deployment/Streamlit/streamlit.log
