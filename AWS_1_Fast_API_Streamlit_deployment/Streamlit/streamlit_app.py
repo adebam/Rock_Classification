@@ -24,6 +24,7 @@ st.write("choose *s3 Images* to analyze one image from Amazon s3 bucket")
 st.write("choose *Multiple s3 Images* to analyze multiple images from Amazon s3 bucket")
 st.write("choose *Single Images* to analyze a single image uploaded from local computer")
 st.write("choose *Multiple Images* to analyze a multiple images uploaded from local computer")
+st.write("choose *url* to analyze one image from a link")
 
 st.header("2. Prediction")
 prediction_mode = st.radio("Choose prediction mode",
@@ -32,7 +33,7 @@ prediction_mode = st.radio("Choose prediction mode",
         "Multiple s3 Images",
         "Single Image",
         "Multiple Images",
-        "Local Test Folder",
+        #"Local Test Folder",
         "URL"
     ]
 )

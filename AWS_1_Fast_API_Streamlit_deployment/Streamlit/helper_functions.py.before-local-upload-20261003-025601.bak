@@ -115,12 +115,6 @@ def single_image_prediction():
                 top3_df["score"] = (top3_df["score"] * 100).round(2)
                 top3_df = top3_df.rename(columns={"label": "Class","score": "Probability (%)"})
                 st.dataframe(top3_df,use_container_width=True)
-                st.markdown(
-                    "> **Note:**  \n"
-                    "> **Prediction** — *The predicted class of the image.*  \n"
-                    "> **Confidence** — *The probability assigned to the predicted class "
-                    "(the class with the highest predicted probability).*  \n"
-                )
             except requests.RequestException as e:
                 st.error(
                     f"FastAPI request failed: {e}"
@@ -203,7 +197,86 @@ def multiple_images_prediction():
         )
 
 def local_test_prediction():
-    multiple_images_prediction()
+    folder_path = st.text_input("Enter local test folder path")
+
+    if folder_path and st.button("Run Folder Prediction"):
+        if not os.path.isdir(folder_path):
+            st.error("Folder does not exist.")
+            return
+
+        image_files = []
+        for filename in os.listdir(folder_path):
+            if filename.lower().endswith((".jpg", ".jpeg", ".png")):
+                image_files.append(os.path.join(folder_path, filename))
+
+        if not image_files:
+            st.warning("No images found.")
+            return
+
+        st.write(f"Found **{len(image_files)} images**")
+
+        api_url = (
+            "http://127.0.0.1:8000/"
+            "api/v1/rock_classification/multiple-images"
+        )
+        files = []
+        opened_files = []
+        try:
+            for image_path in image_files:
+                f = open(image_path, "rb")
+                opened_files.append(f)
+                files.append(
+                    (
+                        "files",
+                        (
+                            os.path.basename(image_path),
+                            f,
+                            "image/jpeg",
+                        )
+                    )
+                )
+
+            response = requests.post( api_url,files=files,timeout=120)
+            response.raise_for_status()
+            data = response.json()
+            results = []
+
+            for result in data["results"]:
+                results.append({
+                    "Filename": result["image_source"],
+                    "Prediction": result["predicted_class"],
+                    "Confidence": result["confidence"],
+                    "Accepted": result["accepted"],
+                })
+            results_df = pd.DataFrame(results)
+            results_df["Confidence"] = (results_df["Confidence"] * 100).round(2)
+
+            st.subheader("Results")
+            st.dataframe(results_df,use_container_width=True)
+            accepted = results_df["Accepted"].sum()
+            total = len(results_df)
+            coverage = accepted / total
+
+            st.write(f"### Coverage: {coverage:.2%}")
+            st.write(f"Accepted images: **{accepted}/{total}**")
+
+        except requests.RequestException as e:
+            st.error(f"FastAPI request failed: {e}")
+
+        finally:
+            for f in opened_files:
+                f.close()
+            st.markdown(
+                "> **Note:**  \n"
+                "> **Prediction** — *The predicted class of the image.*  \n"
+                "> **Confidence** — *The probability assigned to the predicted class "
+                "(the class with the highest predicted probability).*  \n"
+                "> **Accepted** — *A prediction is accepted if its confidence is greater than "
+                "or equal to the minimum confidence threshold (75%).*  \n"
+                "> **Threshold** — *The minimum confidence required for a prediction to be accepted.*  \n"
+                "> **Coverage** — *The percentage of images accepted: "
+                "accepted images / total images × 100.*"
+            )
 
 def url_prediction():
     url = st.text_input("Enter image URL")
@@ -253,14 +326,9 @@ def url_prediction():
                 )
                 st.dataframe(top3_df,use_container_width=True)
             
-                st.markdown(
-                    "> **Note:**  \n"
-                    "> **Prediction** — *The predicted class of the image.*  \n"
-                    "> **Confidence** — *The probability assigned to the predicted class "
-                    "(the class with the highest predicted probability).*  \n"
-                )
             except requests.RequestException as e:
                 st.error(f"API request failed: {e}")
+
 
 
 def s3_prediction(
@@ -355,14 +423,9 @@ def s3_prediction(
                 }
             )
             st.dataframe(top3_df,use_container_width=True)
-            st.markdown(
-                "> **Note:**  \n"
-                "> **Prediction** — *The predicted class of the image.*  \n"
-                "> **Confidence** — *The probability assigned to the predicted class "
-                "(the class with the highest predicted probability).*  \n"
-            )
         except requests.RequestException as e:
             st.error(f"FastAPI request failed: {e}")
+
 
 def s3_multi_image_prediction(
     BUCKET_NAME="super-dayo-409400548716",

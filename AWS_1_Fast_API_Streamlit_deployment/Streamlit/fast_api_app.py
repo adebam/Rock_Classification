@@ -472,6 +472,6 @@ def multiple_s3_image_rock_classification(data: S3BatchImageDataInput):
         results=results,
     )    
     
-    
+ # connects fast api to streamlit   
 if __name__=="__main__":
-    uvicorn.run(app="fast_api_app:app", port=8502, reload=True, host="0.0.0.0")
+    uvicorn.run(app="fast_api_app:app", port=8000, reload=True, host="0.0.0.0")

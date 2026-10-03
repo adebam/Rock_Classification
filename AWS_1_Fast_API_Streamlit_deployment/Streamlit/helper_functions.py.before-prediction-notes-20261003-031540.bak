@@ -115,15 +115,15 @@ def single_image_prediction():
                 top3_df["score"] = (top3_df["score"] * 100).round(2)
                 top3_df = top3_df.rename(columns={"label": "Class","score": "Probability (%)"})
                 st.dataframe(top3_df,use_container_width=True)
-                st.markdown(
-                    "> **Note:**  \n"
-                    "> **Prediction** — *The predicted class of the image.*  \n"
-                    "> **Confidence** — *The probability assigned to the predicted class "
-                    "(the class with the highest predicted probability).*  \n"
-                )
             except requests.RequestException as e:
                 st.error(
                     f"FastAPI request failed: {e}"
+                )
+                st.markdown(
+                "> **Note:**  \n"
+                "> **Prediction** — *The predicted class of the image.*  \n"
+                "> **Confidence** — *The probability assigned to the predicted class "
+                "(the class with the highest predicted probability).*  \n"
                 )
 
 def multiple_images_prediction():
@@ -253,14 +253,14 @@ def url_prediction():
                 )
                 st.dataframe(top3_df,use_container_width=True)
             
-                st.markdown(
-                    "> **Note:**  \n"
-                    "> **Prediction** — *The predicted class of the image.*  \n"
-                    "> **Confidence** — *The probability assigned to the predicted class "
-                    "(the class with the highest predicted probability).*  \n"
-                )
             except requests.RequestException as e:
                 st.error(f"API request failed: {e}")
+                st.markdown(
+                "> **Note:**  \n"
+                "> **Prediction** — *The predicted class of the image.*  \n"
+                "> **Confidence** — *The probability assigned to the predicted class "
+                "(the class with the highest predicted probability).*  \n"
+                )
 
 
 def s3_prediction(
@@ -355,14 +355,14 @@ def s3_prediction(
                 }
             )
             st.dataframe(top3_df,use_container_width=True)
-            st.markdown(
+        except requests.RequestException as e:
+            st.error(f"FastAPI request failed: {e}")
+                st.markdown(
                 "> **Note:**  \n"
                 "> **Prediction** — *The predicted class of the image.*  \n"
                 "> **Confidence** — *The probability assigned to the predicted class "
                 "(the class with the highest predicted probability).*  \n"
-            )
-        except requests.RequestException as e:
-            st.error(f"FastAPI request failed: {e}")
+                )
 
 def s3_multi_image_prediction(
     BUCKET_NAME="super-dayo-409400548716",
