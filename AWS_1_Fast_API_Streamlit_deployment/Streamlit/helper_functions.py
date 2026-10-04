@@ -408,48 +408,76 @@ confidence_threshold=0.75):
                 "api/v1/rock_classification/"
                 "multiple-s3-images"
             )
-            payload = {"bucket_name": BUCKET_NAME,"keys": selected_keys,}
-            try:
-                response = requests.post(
-                    api_url,
-                    json=payload,
-                    timeout=120,
+            data = {"results": [], "total_prediction_time": 0.0}
+            batch_size = 20
+            failed = False
+            progress = st.progress(0.0, text=f"Processed 0 of {len(selected_keys)} images")
+            for start in range(0, len(selected_keys), batch_size):
+                batch_keys = selected_keys[start:start + batch_size]
+                try:
+                    response = requests.post(
+                        api_url,
+                        json={"bucket_name": BUCKET_NAME, "keys": batch_keys},
+                        timeout=(10, 120),
+                    )
+                    response.raise_for_status()
+                    batch_data = response.json()
+                except requests.Timeout:
+                    st.error(
+                        f"Prediction timed out for images {start + 1} to "
+                        f"{start + len(batch_keys)}. Completed "
+                        f"{len(data['results'])} of {len(selected_keys)} images. "
+                        "The server may still be processing that request. "
+                        "Wait before retrying the remaining images."
+                    )
+                    failed = True
+                    break
+                except requests.RequestException as exc:
+                    st.error(f"FastAPI request failed: {exc}")
+                    failed = True
+                    break
+                data["results"].extend(batch_data["results"])
+                data["total_prediction_time"] += batch_data["total_prediction_time"]
+                completed = len(data["results"])
+                progress.progress(
+                    completed / len(selected_keys),
+                    text=f"Processed {completed} of {len(selected_keys)} images",
                 )
-                response.raise_for_status()
-                data = response.json()
-                # ---------------------------------------------
-                # RESULTS TABLE
-                # ---------------------------------------------
-                results = []
-                for result in data["results"]:
-                    image_source = result["image_source"]
-                    results.append({
-                        "Filename": image_source.split("/")[-1],
-                        "S3 Folder": image_source.split("/")[-2],
-                        "Prediction": result["predicted_class"],
-                        "Confidence": result["confidence"],
-                        "Accepted": result["accepted"],
-                    })
+            if not data["results"]:
+                return
+            if failed:
+                st.warning(
+                    f"Showing {len(data['results'])} completed predictions out of "
+                    f"{len(selected_keys)} selected images. "
+                    "Coverage is calculated only for these completed predictions."
+                )
+            results = []
+            for result in data["results"]:
+                image_source = result["image_source"]
+                results.append({
+                    "Filename": image_source.split("/")[-1],
+                    "S3 Folder": image_source.split("/")[-2],
+                    "Prediction": result["predicted_class"],
+                    "Confidence": result["confidence"],
+                    "Accepted": result["accepted"],
+                })
 
-                results_df = pd.DataFrame(results)
-                results_df["Confidence"] = (results_df["Confidence"] * 100).round(2)
-                st.subheader("Results")
-                st.dataframe(results_df,use_container_width=True,)
-                # ---------------------------------------------
-                # TOTAL PREDICTION TIME
-                # ---------------------------------------------
-                st.write(f"Total prediction time: "f"**{data['total_prediction_time']:.3f} seconds**")
-                # ---------------------------------------------
-                # COVERAGE
-                # ---------------------------------------------
-                accepted = results_df["Accepted"].sum()
-                total = len(results_df)
-                coverage = accepted / total
+            results_df = pd.DataFrame(results)
+            results_df["Confidence"] = (results_df["Confidence"] * 100).round(2)
+            st.subheader("Completed results" if failed else "Results")
+            st.dataframe(results_df,use_container_width=True,)
+            # ---------------------------------------------
+            # TOTAL PREDICTION TIME
+            # ---------------------------------------------
+            st.write(f"Total prediction time: "f"**{data['total_prediction_time']:.3f} seconds**")
+            # ---------------------------------------------
+            # COVERAGE
+            # ---------------------------------------------
+            accepted = results_df["Accepted"].sum()
+            total = len(results_df)
+            coverage = accepted / total
 
-                st.write(f"### Coverage: {coverage:.2%}")
-                st.write(f"Accepted images: **{accepted}/{total}**")
-            except requests.RequestException as e:
-                st.error(f"FastAPI request failed: {e}")
+            st.write(f"### Coverage: {coverage:.2%}")
             st.write(f"Accepted images: **{accepted}/{total}**")
             st.markdown(
                 "> **Note:**  \n"
