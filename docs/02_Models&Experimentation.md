@@ -266,7 +266,7 @@ Although the selected model achieved strong validation performance, its final te
 With 22 classes, a model guessing entirely at random would achieve an accuracy of only about 4.5% (1 out of 22). The model's achieved 28.17%, it is performing roughly six times better than random chance. This proves the model is extracting meaningful visual features from the rock images, but it accuracy is not good enough.
 
 #### Insights from the Confusion Matrix and Class-wise F1 Scores
-The confusion matrices and class-wise F1 scores provided important insight into the behavior of the classifier beyond the overall accuracy and macro F1 values. In particular, they revealed that several classes were consistently confused with one another, suggesting that some of the original class boundaries were not well separated in the image space.
+The confusion matrix  provided important insight into classifier behavior beyond the overall accuracy and macro F1. While the macro F1 indicated poor performance across the 22 classes as a whole, the class-level analysis revealed the source of this weakness. In particular, the confusion matrix showed repeated confusion between specific class pairs, suggesting that some of the original class boundaries were not well separated in the image space.
 <p align="center">
   <img src="../pictures/22_Classes_F1scorebyclass.png" alt="Model Selection"><br>
   <i>Figure 7: F1 Score by Class</i>
@@ -277,10 +277,6 @@ The confusion matrices and class-wise F1 scores provided important insight into 
   <i>Figure 8: Confusion Matrix for Validation, 22 classes</i>
 </p>
 
-<p align="center">
-  <img src="../pictures/22_classes_confusionmatrix_test.png" alt="Model Selection"><br>
-  <i>Figure 9: Confusion Matrix for Test, 22 classes</i>
-</p>
 
 ##### Motivation for merging selected classes
 Based on the confusion matrices and class-wise F1 results, three class pairs were identified as candidates for merging:
@@ -291,11 +287,11 @@ Based on the confusion matrices and class-wise F1 results, three class pairs wer
 
 These pairs were selected because they showed **repeated bidirectional confusion**, meaning that samples from one class were frequently predicted as the other, and vice versa. This pattern appeared in both the training and validation confusion matrices, indicating that the issue was not a one-off result but a persistent classification difficulty.
 
-For **Class 13 and Class 2**, the confusion matrix showed that these two classes were often mistaken for each other, while their class-wise F1 scores were weaker than those of better-separated classes. This suggests that the visual distinction between the two classes may be too subtle, inconsistent, or poorly represented in the dataset.
+For **Class 13 and Class 2**, the confusion matrix showed that these two classes were often mistaken for each other. This suggests that the visual distinction between the two classes may be too subtle, inconsistent, or poorly represented in the dataset.
 
 For **Class 21 and Class 22**, the same pattern was even more important. These two classes were heavily confused with one another despite having large numbers of training examples. Their mutual confusion suggests that the problem is not simply that the model saw too few examples, but that the classes themselves may overlap visually or may not be consistently labeled.
 
-For **Class 18 and Class 19**, the confusion matrix again showed substantial off-diagonal counts in both directions. Their class-wise F1 scores also reflected this instability. This indicates that the model was struggling to learn a robust boundary between these two classes.
+For **Class 18 and Class 19**, the confusion matrix again showed substantial off-diagonal counts in both directions. This indicates that the model was struggling to learn a robust boundary between these two classes.
 
 Merging these class pairs was therefore a practical attempt to reduce ambiguity in the label space. If two classes are consistently confused and are difficult to separate visually, combining them can create a more stable and meaningful classification problem.
 

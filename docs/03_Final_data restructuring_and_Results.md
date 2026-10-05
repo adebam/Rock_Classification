@@ -120,6 +120,82 @@ However, these results should not be interpreted as a perfectly controlled model
 
 The restructuring experiment therefore produced an important result: simplifying the label space improved overall performance, but did not resolve the underlying generalization problem.
 
-The original 22-class results suggested that class imbalance, class overlap, and dataset quality were all contributing to poor performance. Imbalance-aware training improved performance, confirming that class frequency mattered. Restructuring the labels provided a further improvement, indicating that ambiguous class definitions also mattered. Yet the continued train–validation–test degradation and the remaining confusion between multiple classes show that neither intervention completely addressed the problem.
+### Color Distribution of Images in Classes across Train, Validation & Test Dataset
+Image-property analysis revealed that the performance degradation from validation to test was accompanied by measurable within-class distribution shifts. For example, Class 14 training and validation images showed similar color and brightness distributions, whereas the test images exhibited very different RGB intensity and brightness and substantially saturation. This suggests that differences in image appearance between splits may have contributed to the reduced test-set generalization.
+<p align="center">
+  <img src="../pictures/split_comparison_class14_properties.png" alt="Class 14 distribution across split"><br>
+  <i>Figure 4: Class 14 distribution across split</i>
+</p>
 
-> **Note:** The final results suggest that the limiting factor is not simply model architecture or class imbalance, but the separability and consistency of the underlying dataset. Class restructuring improved the task, but substantial ambiguity remained among unseen petrographic images.
+<p align="center">
+  <img src="../pictures/split_comparison_class2_class13_properties.png" alt="Class2_3 distribution across split"><br>
+  <i>Figure 5: Class 14 distribution across split</i>
+</p>
+
+<p align="center">
+  <img src="../pictures/split_distribution_shift_heatmap_22classes_spacious.png" alt="Heatmpa_all_classes"><br>
+  <i>Figure 6: Class 14 distribution across split</i>
+</p>
+
+
+The heatmap compares how image properties differ between the training distribution and the validation/test splits for each class. Most validation cells are relatively close to zero, indicating that validation images are generally similar to the training data. In contrast, the test split shows larger shifts for several classes, particularly in color intensity, brightness, contrast, and saturation.
+This suggests that part of the drop in test performance may be related to distribution shift: some test images have visual characteristics that differ from the images the model was trained on. However, the effect is not uniform across all classes, so distribution shift is likely one contributor rather than the only cause of poor generalization.
+
+
+
+The original 22-class experiments showed that no single factor fully explained the poor performance. Imbalance-aware training improved results, confirming that class frequency mattered, while restructuring the labels produced a further gain, showing that ambiguous or overlapping class definitions also contributed to the problem. However, the persistent train–validation–test performance gap indicated that these changes did not fully resolve the generalization issue.
+The split-distribution analysis provides additional evidence that the dataset itself is a major limitation. Validation images were generally closer to the training distribution, while several test classes showed larger shifts in color intensity, brightness, contrast, and saturation. This suggests that part of the test-performance degradation may be caused by distribution shift between the training and test images, in addition to class overlap and labeling ambiguity.
+
+> **Note:** The final results suggest that the main limitation is not simply model architecture or class imbalance, but the overall consistency and separability of the dataset. Class restructuring improved the task, yet substantial class ambiguity and measurable differences in image properties across dataset splits remained, limiting generalization to unseen petrographic images.
+
+Even if overall test performance is limited, can the model still identify a subset of predictions that are reliable?
+
+## Confidence Analysis
+The final evaluation showed that the classifier does not generalize equally well across all unseen images. The image-property analysis also suggested that some test samples differ from the training distribution, which may contribute to uncertain or unreliable predictions. Also the model predicted some images with high degree of probability, yet the image was classified incorrectly.
+
+For deployment, this means that returning a class label for every image may be misleading. Instead, the model’s predicted probability can be used as a confidence measure, allowing low-confidence predictions to be flagged rather than automatically accepted, while also identifying high-confidence predictions that disagree with the assigned label as potential labeling inconsistencies for further review.
+
+For each image, the predicted class is the class with the highest softmax probability, and the corresponding probability is treated as the model confidence. A prediction is accepted only when this confidence exceeds a selected threshold. That confidence score was then used as a filter: predictions above a selected cutoff were accepted, while lower-confidence predictions were flagged for review. The predicted classes themselves did not change; only the subset of predictions considered acceptable was adjusted.
+
+### Getting a threshold of 75%
+
+The analysis began with the 5,994 validation images. Without applying any confidence filter, the model matched the provided labels on 55.71% of the images. The minimum confidence threshold was then increased gradually from 50% to 90%, while tracking two quantities: the accuracy of the accepted predictions and the proportion of images that remained accepted.
+
+A clear tradeoff emerged. As the confidence threshold increased, the accepted predictions became more accurate, but fewer images met the acceptance criterion.
+At a 70% confidence threshold, approximately half of the images were accepted, with 69.07% accuracy among the accepted predictions. Increasing the threshold to 75% raised accepted accuracy to 70.95%, while retaining 45.71% of the images. At an 80% threshold, accepted accuracy increased further to 72.37%, but coverage fell to 39.37%.
+
+<p align="center">
+  <img src="../pictures/06_threshold_validation_tradeoff_summary.png" alt="ConfidencePlot"><br>
+  <i>Figure 6: Confidence Plot for all classes</i>
+</p>
+
+A 75% confidence threshold was selected as the main operating point because it provided a practical balance between prediction reliability and coverage. This threshold was not derived from a formal optimization rule; rather, it was chosen as a reasonable tradeoff between accepting enough images and improving the accuracy of the accepted subset.
+
+<p align="center">
+  <img src="../pictures/06_threshold_75_per_class_validation.png" alt="ConfidencePlot"><br>
+  <i>Figure 7: Confidence Plot per class</i>
+</p>
+
+
+The class-level results also showed that the confidence threshold did not behave uniformly across all classes. Some classes retained many high-confidence predictions with relatively strong accuracy, while others retained very few images or continued to show substantial disagreement with the provided labels. This indicated that the overall threshold-level accuracy could hide important differences in class-specific behavior.
+
+### Confidence Results on the Test
+The 75% confidence threshold, selected using the validation dataset, was then fixed and applied unchanged to the 2,786 test images using the same trained model and preprocessing pipeline. This allowed the threshold to be evaluated on previously unseen data without further adjustment.
+| Result | Validation | Test |
+| :--- | ---: | ---: |
+| **Accuracy without rejection** | 55.71% | 38.55% |
+| **Images accepted at 75% confidence** | 2,740 / 5,994 | 923 / 2,786 |
+| **Coverage** | 45.71% | 33.13% |
+| **Correct accepted predictions** | 1,944 | 440 |
+| **Accepted predictions disagreeing with labels** | 796 | 483 |
+| **Accuracy among accepted images** | 70.95% | 47.67% |
+
+Applying the confidence threshold improved test accuracy among the accepted predictions from 38.55% to 47.67%, an increase of approximately 9.1 percentage points. This shows that model confidence contains useful information: higher-confidence predictions were more likely to agree with the provided labels than predictions considered as a whole.
+
+However, the improvement was substantially smaller than on the validation set. At the same 75% threshold, validation accuracy among accepted images was 70.95%, compared with only 47.67% on the test set. Coverage also decreased from 45.71% on validation to 33.13% on test. Therefore, the same confidence threshold accepted fewer test images and those accepted predictions were considerably less reliable.
+
+This result is consistent with the earlier evidence of distribution differences between the training/validation and test datasets. A confidence score of 75% therefore did not correspond to the same observed accuracy across the two evaluation sets. In other words, the model could still be highly confident on test images even when its prediction disagreed with the provided label.
+
+The **high-confidence disagreements are particularly important. Of the 923 test images accepted at the 75% threshold, 483 (52.33%) disagreed with the provided labels**. These cases should not automatically be interpreted as model errors or labeling errors. Instead, they represent a useful subset for further investigation. Repeated high-confidence disagreements involving the same classes or visually similar images may indicate class overlap, distribution shift, or potential labeling inconsistencies.
+
+> **Overall interpretation**: Confidence-based rejection improved the reliability of accepted predictions, but confidence alone was not sufficient to overcome the test-set generalization problem. The large difference between validation and test performance at the same threshold suggests that the model's confidence is not equally reliable across dataset splits. Nevertheless, confidence remains useful both for rejecting uncertain predictions and for identifying high-confidence disagreements that may warrant manual review.
