@@ -1,0 +1,36 @@
+{
+  "cache_key": "cf4432ae922a38fe1027ef5089fd95d8ef8b42894c4a7644d7ba1ed3fab94f86",
+  "settings": {
+    "version": 1,
+    "long_edge": 256,
+    "bottom_crop": 0,
+    "hist_bins": 32,
+    "file_hashes": true,
+    "split_order": [
+      "train",
+      "val",
+      "test"
+    ],
+    "class_order": [
+      "class2_class13",
+      "class3",
+      "class4",
+      "class5",
+      "class6",
+      "class7",
+      "class8",
+      "class9",
+      "class10",
+      "class11",
+      "class12",
+      "class14",
+      "class15",
+      "class16",
+      "class17",
+      "class18_class19",
+      "class20",
+      "class21_class22"
+    ]
+  },
+  "images_measured": 22689
+}
